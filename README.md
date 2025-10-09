@@ -1,4 +1,3 @@
-```markdown
 # HTTP/TLS Server & Security Testing Toolkit
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -85,8 +84,8 @@ http-tls-security-toolkit/
 
 I'm documenting the entire build process through a blog series. Follow along to see challenges, solutions, and lessons learned.
 
-- Blog: [Coming soon]
-- Demo Video: [Coming soon]
+- **Blog:** [Coming soon]
+- **Demo Video:** [Coming soon]
 
 ## 🎓 About This Project
 
@@ -95,11 +94,11 @@ This is part of my cybersecurity portfolio as I work toward an entry-level SOC a
 **Author:** Ethan Martin  
 **University:** California State University, Channel Islands  
 **Major:** Computer Science  
-**Club:** Treasurer, Ethical Hackers of Channel Islands  
+**Club:** Treasurer, Ethical Hackers of Channel Islands
 
 ## 📝 License
 
-MIT License - see [LICENSE](LICENSE) file for details
+MIT License - see LICENSE file for details
 
 ## 🤝 Contributing
 
@@ -107,7 +106,4 @@ This is a personal learning project, but feedback and suggestions are welcome! F
 
 ---
 
-⭐ Star this repo if you find it useful or interesting!
-```
-
----
+⭐ **Star this repo if you find it useful or interesting!**
