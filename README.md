@@ -93,7 +93,7 @@ This is part of my cybersecurity portfolio as I work toward an entry-level SOC a
 
 **Author:** Ethan Martin  
 **University:** California State University, Channel Islands  
-**Major:** Computer Science  
+**Major:** Information Technology  
 **Club:** Treasurer, Ethical Hackers of Channel Islands
 
 ## 📝 License
