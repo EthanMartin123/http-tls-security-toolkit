@@ -1,33 +1,113 @@
-# http-server
-A lightweight, multi-threaded HTTP server built from scratch using C and POSIX sockets. Designed with security and performance in mind, demonstrating low-level network programming and secure coding practices.
+```markdown
+# HTTP/TLS Server & Security Testing Toolkit
 
-# Overview
-This project implements a functional HTTP/1.1 server without relying on external web server libraries. Each client connection is handled in a separate thread, allowing concurrent request processing. The server includes security features like request validation, rate limiting, and comprehensive logging.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Language: C](https://img.shields.io/badge/Language-C-blue.svg)](https://en.wikipedia.org/wiki/C_(programming_language))
+[![Status: In Development](https://img.shields.io/badge/Status-In%20Development-orange.svg)]()
 
-# Why I Built This:
-To understand how web servers work at the lowest level and to practice writing secure, production-quality C code. This project bridges my development skills with security awareness - essential for application security roles.
+A lightweight HTTP/TLS server built from scratch in C to deeply understand network security, cryptographic protocols, and common web vulnerabilities.
 
-# Features:
+## 🎯 Project Goals
 
-  # Multi-threaded Architecture: 
-    Each connection handled by dedicated thread using POSIX threads
-  # HTTP/1.1 Support: 
-    GET and POST method handling with proper response codes
-  # Security-Focused:
-    Input validation to prevent buffer overflows
-    Rate limiting to prevent abuse (configurable requests per IP)
-    Request size limits to prevent DoS
-    Sanitized error messages (no internal info leakage)
-  # Comprehensive Logging: 
-    All requests, errors, and suspicious activity logged with timestamps
-  # Static File Serving: 
-    Serves HTML, CSS, JS, images with correct MIME types
-  # Graceful Error Handling: 
-    Proper HTTP error responses (400, 404, 500, etc.)
+This project demonstrates:
+- Low-level network programming with sockets
+- HTTP/1.1 protocol implementation
+- TLS/SSL encryption with OpenSSL
+- Security vulnerability research and documentation
+- Building security testing tools from scratch
 
-# Technical Details
-Built With:
-  C (C99 standard)
-  POSIX sockets API
-  POSIX threads (pthread)
-  Standard C libraries only
+## ✨ Features
+
+### Currently Implemented
+- ✅ HTTP/1.1 server with socket programming
+- ✅ GET request handling for static files
+- ✅ POST request handling with form data
+- ✅ Multiple route support
+- ✅ Proper HTTP status codes (200, 404, 400, 405, 500)
+
+### Coming Soon
+- 🚧 TLS 1.2/1.3 encryption
+- 🚧 Security testing tools (scanner, fuzzer, analyzer)
+- 🚧 Vulnerability documentation
+- 🚧 Comprehensive security analysis
+
+## 🚀 Quick Start
+
+### Prerequisites
+- GCC compiler
+- Make (optional but recommended)
+
+### Build and Run
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/http-tls-security-toolkit.git
+cd http-tls-security-toolkit
+
+# Compile
+gcc -o server src/server.c -Wall -Wextra
+
+# Run server
+./server
+
+# Test in another terminal
+curl http://localhost:8080/
+```
+
+### Test POST Requests
+
+```bash
+curl -X POST http://localhost:8080/submit \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "name=Test&email=test@example.com"
+```
+
+## 📁 Project Structure
+
+```
+http-tls-security-toolkit/
+├── src/              # Server source code
+│   └── server.c      # Main HTTP server implementation
+├── www/              # Static web files
+│   ├── index.html
+│   ├── about.html
+│   └── submit.html
+└── README.md
+```
+
+## 🛠️ Technologies
+
+- **Language:** C
+- **Network:** POSIX sockets
+- **Upcoming:** OpenSSL for TLS, Python for security tools
+
+## 📚 Learning Journey
+
+I'm documenting the entire build process through a blog series. Follow along to see challenges, solutions, and lessons learned.
+
+- Blog: [Coming soon]
+- Demo Video: [Coming soon]
+
+## 🎓 About This Project
+
+This is part of my cybersecurity portfolio as I work toward an entry-level SOC analyst position. I'm building hands-on projects to demonstrate real-world security skills.
+
+**Author:** Ethan Martin  
+**University:** California State University, Channel Islands  
+**Major:** Computer Science  
+**Club:** Treasurer, Ethical Hackers of Channel Islands  
+
+## 📝 License
+
+MIT License - see [LICENSE](LICENSE) file for details
+
+## 🤝 Contributing
+
+This is a personal learning project, but feedback and suggestions are welcome! Feel free to open an issue.
+
+---
+
+⭐ Star this repo if you find it useful or interesting!
+```
+
+---
