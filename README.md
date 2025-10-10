@@ -84,7 +84,7 @@ http-tls-security-toolkit/
 
 I'm documenting the entire build process through a blog series. Follow along to see challenges, solutions, and lessons learned.
 
-- **Blog:** [Coming soon]
+- **Blog:** https://dev.to/ethan_ac5ca38abc559d950c9
 - **Demo Video:** [Coming soon]
 
 ## 🎓 About This Project
