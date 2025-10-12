@@ -17,9 +17,59 @@
 #include <stdlib.h>
 #include <netdb.h>
 
+#include <openssl/ssl.h>
+#include <openssl/err.h>
+#include <openssl/crypto.h>
+
 #define PORT "8080"
 #define BACKLOG 1
 #define BUFFER_SIZE 8192
+
+SSL_CTX *setup_tls() {
+  SSL_library_init();
+  OpenSSL_add_all_algorithms();
+  SSL_load_error_strings();
+
+  SSL_CTX *ctx = SSL_CTX_new(TLS_server_method());
+  if (!ctx) {
+    perror("Unable to create SSL context");
+    ERR_print_errors_fp(stderr);
+    exit(EXIT_FAILURE);
+  }
+
+  if (SSL_CTX_set_cipher_list(ctx, "DEFAULT:!aNULL:!eNULL") == -1) {
+    fprintf(stderr, "failed to set cipher list\n");
+    ERR_print_errors_fp(stderr);
+    exit(EXIT_FAILURE);
+  }
+
+  if (SSL_CTX_set_ciphersuites(ctx, "TLS_AES_256_GCM_SHA384:TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256")  == -1) {
+    fprintf(stderr, "Failed to set TLS 1.3 cipher suites");
+    ERR_print_errors_fp(stderr);
+    exit(EXIT_FAILURE);
+  }
+
+  if (SSL_CTX_use_certificate_file(ctx, "certs/cert.pem", SSL_FILETYPE_PEM) == -1) {
+    perror("Unable to use cert file");
+    ERR_print_errors_fp(stderr);
+    exit(EXIT_FAILURE);
+  }
+
+  if (SSL_CTX_use_PrivateKey_file(ctx, "certs/key.pem", SSL_FILETYPE_PEM) == -1) {
+    perror("Unable to use private key file");
+    ERR_print_errors_fp(stderr);
+    exit(EXIT_FAILURE);
+  }
+
+  if (SSL_CTX_check_private_key(ctx) == -1) {
+    fprintf(stderr, "Private Key does not match certificate\n");
+    exit(EXIT_FAILURE);
+  }
+
+  printf("✅ TLS Configured Successfully\n");
+
+  return ctx;
+}
 
 // ========================================
 // FILE RESPONSE HANDLER
@@ -27,7 +77,7 @@
 // Returns 404 if file not found
 // ========================================
 
-void send_file_response(int new_fd, const char* filepath) {
+void send_file_response(SSL *ssl, const char* filepath) {
   FILE *file = fopen(filepath, "r");
 
   if (file == NULL) {
@@ -38,7 +88,7 @@ void send_file_response(int new_fd, const char* filepath) {
       "<html><body><h1>404 Not Found</h1><p>The file does not exit</p></body></html>";
     
 
-    send(new_fd, response_404, strlen(response_404), 0);
+    SSL_write(ssl, response_404, strlen(response_404));
     printf("404 - File not found: %s\n", filepath);
     return;
   }
@@ -57,7 +107,7 @@ void send_file_response(int new_fd, const char* filepath) {
       "<html><body><h1>500 Internal Server Error</h1></body></html>";
     
 
-    send(new_fd, response_500, strlen(response_500), 0);
+    SSL_write(ssl, response_500, strlen(response_500));
     printf("500 - Internal Server Error\n");
     return;
   }
@@ -75,10 +125,10 @@ void send_file_response(int new_fd, const char* filepath) {
                             size);
 
   // send header 
-  send(new_fd, response, header_len, 0);
+  SSL_write(ssl, response, header_len);
 
   // send file content 
-  send(new_fd, file_content, size, 0);
+  SSL_write(ssl, file_content, size);
 
   printf("200 OK - Sent file: %s (%ld bytes)\n", filepath, size);
   free(file_content);
@@ -91,7 +141,7 @@ void send_file_response(int new_fd, const char* filepath) {
 // Parses HTTP headers for Content-Length
 // Returns -1 if invalid/missing
 // ========================================
-int extract_content_length(int new_fd, const char* buffer) {
+int extract_content_length(SSL *ssl, const char* buffer) {
   
   const char* response_400 = 
     "HTTP/1.1 400 Bad Request\r\n"
@@ -103,7 +153,7 @@ int extract_content_length(int new_fd, const char* buffer) {
 
   char* result = strstr(buffer, "Content-Length:");
   if (result == NULL) {
-    send(new_fd, response_400, strlen(response_400),0);
+    SSL_write(ssl, response_400, strlen(response_400));
     printf("400 Bad Request: Missing Content-Length\n");
     return -1;
   }
@@ -112,7 +162,7 @@ int extract_content_length(int new_fd, const char* buffer) {
   // jump to the end of "Content-Length: ", extract decimal integer, store in content_length
   int content_length;
   if (sscanf(result + 15, "%d", &content_length) != 1) {
-    send(new_fd, response_400, strlen(response_400), 0);
+    SSL_write(ssl, response_400, strlen(response_400));
     printf("400 Bad Request: Invalid Content-Length\n");
     return -1;
   }
@@ -237,7 +287,14 @@ int main() {
     perror("listen");
     exit(1);
   }
-  printf("Listening on %s\n", PORT);
+
+  SSL_CTX *ssl_ctx = setup_tls();
+  if (!ssl_ctx) {
+    perror("failed to create context");
+    exit(EXIT_FAILURE);
+  }
+
+  printf("HTTPS Listening on %s\n", PORT);
 
   while(1) {
 
@@ -246,14 +303,37 @@ int main() {
     new_fd = accept(sockfd, (struct sockaddr *)&client_addr, &client_len);
     if (new_fd == -1) {
       perror("accept");
-      return -1;
+      continue;
     }
 
-    bytes_received = recv(new_fd, buffer, sizeof(buffer) - 1, 0); // receive bytes
+    // TLS handshake per connection
+    SSL *ssl = SSL_new(ssl_ctx);
+    if (!ssl) {
+      perror("TLS handshake failed");
+      continue;
+    }
+
+    if (SSL_set_fd(ssl, new_fd) == -1) {
+      perror("Failed to set fd with SSL");
+      continue;
+    }
+    
+    printf("Performing TLS handshake...\n");
+
+    if (SSL_accept(ssl) == -1) {
+      fprintf(stderr, "SSL_accept failed\n");
+      ERR_print_errors_fp(stderr);
+      SSL_free(ssl);
+      close(new_fd);
+      continue;
+    }
+
+
+    bytes_received = SSL_read(ssl, buffer, sizeof(buffer) - 1); // receive bytes
 
     if (bytes_received > 0) {
       buffer[bytes_received] = '\0'; // adds a null terminator to the end of message
-      printf("Received HTTP Request: \n%s\n", buffer);
+      printf("Received HTTPS Request: \n%s\n", buffer);
 
       if (sscanf(buffer, "%s %s %s", method, path, version) == 3){
 
@@ -262,25 +342,28 @@ int main() {
           char filepath[512];
 
           if (strcmp(path, "/") == 0) {
-            strcpy(filepath, "index.html");
+            strcpy(filepath, "www/index.html");
           }
           else if (strcmp(path, "/about") == 0) {
-            strcpy(filepath, "about.html");
+            strcpy(filepath, "www/about.html");
           } 
+          else if (strcmp(path, "/success") == 0) {
+            strcpy(filepath, "www/success.html");
+          }
           else if (strcmp(path, "/submit") == 0) {
-            strcpy(filepath, "submit.html");
+            strcpy(filepath, "www/submit.html");
           }
           else {
             snprintf(filepath, sizeof(filepath), "%s", path + 1);    
           }
 
-          send_file_response(new_fd, filepath);
+          send_file_response(ssl, filepath);
 
         } else if (strcmp(method, "POST") == 0)
         {
           if (strcmp(path, "/submit") == 0) {
 
-            int content_length = extract_content_length(new_fd, buffer);
+            int content_length = extract_content_length(ssl, buffer);
             printf("DEBUG: content_length = %d\n", content_length);
             if (content_length == -1) {
               close(new_fd);
@@ -297,7 +380,7 @@ int main() {
                 "<p>Malformed HTTP Request</p></body></html>";
               
 
-              send(new_fd, response_400_malformed, strlen(response_400_malformed), 0);
+              SSL_write(ssl, response_400_malformed, strlen(response_400_malformed));
               printf("400 Bad Request: Malformed HTTP Request\n");
               return -1;
             }
@@ -332,8 +415,11 @@ int main() {
               "\r\n"
               "<html><body><h1>Success!</h1><p>Form Submitted successfully</p><a href='/'>Home</a></body></html>";
             
-
-            send(new_fd, response_200, strlen(response_200), 0);
+            
+            char filepath[512];
+            //SSL_write(ssl, response_200, strlen(response_200));
+            strcpy(filepath, "www/success.html");
+            send_file_response(ssl, filepath);
             printf("200 OK - POST processed\n");
 
             free(full_body);
@@ -348,7 +434,7 @@ int main() {
               "<html><body><h1>405 Method Not Allowed</h1></body></html>";
             
 
-            send(new_fd, response_405, sizeof(response_405), 0);
+            SSL_write(ssl, response_405, sizeof(response_405));
             printf("405 - Method Not Allowed: %s\n", method);
           }
         }
@@ -361,12 +447,14 @@ int main() {
             "<html><body><h1>405 Method Not Allowed</h1></body></html>";
           
 
-          send(new_fd, response_405, sizeof(response_405), 0);
+          SSL_write(ssl, response_405, sizeof(response_405));
           printf("405 - Method Not Allowed: %s\n", method);
         }
       }
 
     }
+    SSL_shutdown(ssl);
+    SSL_free(ssl);
     close(new_fd);
 
   }
