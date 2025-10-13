@@ -1,3 +1,5 @@
 certs/cert.pem
 certs/key.pem
 src/server_http_only_backup.c
+www/about.html
+src/server

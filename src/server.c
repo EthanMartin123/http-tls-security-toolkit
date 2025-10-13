@@ -344,9 +344,6 @@ int main() {
           if (strcmp(path, "/") == 0) {
             strcpy(filepath, "www/index.html");
           }
-          else if (strcmp(path, "/about") == 0) {
-            strcpy(filepath, "www/about.html");
-          } 
           else if (strcmp(path, "/success") == 0) {
             strcpy(filepath, "www/success.html");
           }

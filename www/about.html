@@ -97,3 +97,597 @@
             color: #2d3748;
             margin-bottom: 15px;
             font-size: 1.4rem;
+        }
+
+        .highlight-box p {
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .tech-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .tech-card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+        }
+
+        .tech-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .tech-card h3 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .tech-card p {
+            color: #718096;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+            margin: 30px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            padding-left: 30px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -44px;
+            top: 5px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #667eea;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px #667eea;
+        }
+
+        .timeline-item h3 {
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+        }
+
+        .timeline-item p {
+            color: #4a5568;
+            margin-bottom: 5px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .feature-badge {
+            background: #f7fafc;
+            padding: 15px 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .feature-badge:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .feature-badge strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        .feature-badge span {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .code-block code {
+            color: #68d391;
+        }
+
+        .stats-banner {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            border-radius: 15px;
+            color: white;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .stat-item {
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .cta-box {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .cta-box h2 {
+            color: #1a202c;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .quote {
+            font-style: italic;
+            font-size: 1.2rem;
+            color: #4a5568;
+            padding: 25px;
+            border-left: 4px solid #667eea;
+            background: #f7fafc;
+            margin: 25px 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .author {
+            margin-top: 40px;
+            padding: 30px;
+            background: #f7fafc;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .author-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            flex-shrink: 0;
+        }
+
+        .author-info h3 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        .author-info p {
+            color: #4a5568;
+            margin-bottom: 15px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-link {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .section h2 {
+                font-size: 1.5rem;
+            }
+
+            .tech-stack {
+                grid-template-columns: 1fr;
+            }
+
+            .author {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <h1>About This Project</h1>
+            <p>A deep dive into network security, cryptography, and systems programming - building an HTTPS server from the ground up using C and OpenSSL.</p>
+        </div>
+
+        <div class="content">
+            <!-- Project Overview -->
+            <div class="section">
+                <h2>📚 Project Overview</h2>
+                <p>This HTTPS server is a fully functional web server built entirely in C, demonstrating a comprehensive understanding of network programming, the HTTP protocol, and modern cryptographic security. What you're viewing right now is being served over an encrypted TLS 1.3 connection, with every byte of data protected by industry-standard encryption.</p>
+                
+                <p>This isn't just a learning exercise—it's a production-quality implementation that handles real HTTPS traffic, complete with certificate authentication, secure key exchange, and encrypted data transmission. The server was built without frameworks or high-level abstractions, providing intimate knowledge of what happens under the hood of every HTTPS request.</p>
+
+                <div class="highlight-box">
+                    <h3>🎯 Project Goals</h3>
+                    <p><strong>Understand Security at a Fundamental Level:</strong> By implementing TLS from scratch (using OpenSSL), I gained deep insight into how encryption, authentication, and secure communication actually work.</p>
+                    <p><strong>Master Low-Level Systems Programming:</strong> Working with raw sockets, managing memory manually, and handling binary protocols provided invaluable experience with systems-level programming.</p>
+                    <p><strong>Build Portfolio-Worthy Work:</strong> Create a demonstrable project that showcases technical depth, attention to security, and the ability to work with complex specifications.</p>
+                </div>
+            </div>
+
+            <!-- What I Built -->
+            <div class="section">
+                <h2>🛠️ What I Built</h2>
+                
+                <div class="tech-stack">
+                    <div class="tech-card">
+                        <div class="icon">🔌</div>
+                        <h3>Socket Programming</h3>
+                        <p>Low-level TCP socket implementation using BSD sockets API. Handles connection management, data transmission, and graceful shutdown.</p>
+                    </div>
+                    <div class="tech-card">
+                        <div class="icon">🔐</div>
+                        <h3>TLS Integration</h3>
+                        <p>Full OpenSSL integration supporting TLS 1.2 and 1.3 with AES-256-GCM encryption, ECDHE key exchange, and certificate authentication.</p>
+                    </div>
+                    <div class="tech-card">
+                        <div class="icon">📡</div>
+                        <h3>HTTP/1.1 Protocol</h3>
+                        <p>Complete HTTP request parsing and response generation. Supports GET and POST methods, headers, status codes, and content negotiation.</p>
+                    </div>
+                    <div class="tech-card">
+                        <div class="icon">🎨</div>
+                        <h3>Static File Serving</h3>
+                        <p>Efficient file serving with MIME type detection, content-length headers, and proper error handling for 404s and 500s.</p>
+                    </div>
+                    <div class="tech-card">
+                        <div class="icon">📝</div>
+                        <h3>Form Handling</h3>
+                        <p>POST request processing with URL-encoded form data parsing and response generation.</p>
+                    </div>
+                    <div class="tech-card">
+                        <div class="icon">📜</div>
+                        <h3>X.509 Certificates</h3>
+                        <p>Self-signed certificate generation using OpenSSL, with 4096-bit RSA keys and proper certificate validation.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technical Deep Dive -->
+            <div class="section">
+                <h2>⚙️ Technical Implementation</h2>
+                
+                <div class="highlight-box">
+                    <h3>The TLS Handshake</h3>
+                    <p>Every HTTPS connection begins with a TLS handshake. Here's what happens when you visit this page:</p>
+                </div>
+
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h3>1. Client Hello</h3>
+                        <p>Your browser sends a ClientHello message listing supported TLS versions and cipher suites.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h3>2. Server Hello + Certificate</h3>
+                        <p>Server responds with chosen protocol (TLS 1.3), cipher suite (AES-256-GCM), and presents its certificate.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h3>3. Key Exchange</h3>
+                        <p>Client and server perform ECDHE key exchange to establish a shared secret without ever transmitting it.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h3>4. Session Keys Derived</h3>
+                        <p>Both sides independently compute identical session keys from the shared secret.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h3>5. Encrypted Communication</h3>
+                        <p>All subsequent data is encrypted with AES-256-GCM using the derived session keys.</p>
+                    </div>
+                </div>
+
+                <div class="code-block">
+// Core TLS handshake implementation
+SSL *ssl = SSL_new(ssl_ctx);
+SSL_set_fd(ssl, client_fd);
+
+<code>if (SSL_accept(ssl) <= 0) {
+    ERR_print_errors_fp(stderr);
+    return;
+}</code>
+
+// Now connection is encrypted
+SSL_read(ssl, buffer, size);   // Decrypt incoming data
+SSL_write(ssl, response, len); // Encrypt outgoing data
+                </div>
+            </div>
+
+            <!-- Security Features -->
+            <div class="section">
+                <h2>🛡️ Security Features</h2>
+                <p>This server implements multiple layers of security to protect data in transit:</p>
+
+                <div class="features-grid">
+                    <div class="feature-badge">
+                        <strong>AES-256-GCM</strong>
+                        <span>Authenticated encryption</span>
+                    </div>
+                    <div class="feature-badge">
+                        <strong>TLS 1.3</strong>
+                        <span>Latest protocol</span>
+                    </div>
+                    <div class="feature-badge">
+                        <strong>ECDHE</strong>
+                        <span>Perfect forward secrecy</span>
+                    </div>
+                    <div class="feature-badge">
+                        <strong>4096-bit RSA</strong>
+                        <span>Strong key size</span>
+                    </div>
+                    <div class="feature-badge">
+                        <strong>SHA-384</strong>
+                        <span>Secure hashing</span>
+                    </div>
+                    <div class="feature-badge">
+                        <strong>X.509 Certs</strong>
+                        <span>Identity verification</span>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <h3>Why These Matter</h3>
+                    <p><strong>Perfect Forward Secrecy (PFS):</strong> Even if someone records all our encrypted traffic today and later steals the server's private key, they still can't decrypt past communications. Each session uses ephemeral keys that are destroyed after use.</p>
+                    <p><strong>Authenticated Encryption (GCM):</strong> Not only is data encrypted, but any tampering is detected immediately. An attacker can't modify encrypted data without the change being detected.</p>
+                    <p><strong>Modern Ciphers Only:</strong> The server refuses to use weak or deprecated ciphers, ensuring all connections use strong cryptography.</p>
+                </div>
+            </div>
+
+            <!-- Learning Journey -->
+            <div class="section">
+                <h2>📈 What I Learned</h2>
+                
+                <div class="quote">
+                    "I didn't just learn how HTTPS works—I learned why every design decision matters, from buffer sizes to error handling to memory management."
+                </div>
+
+                <div class="stats-banner">
+                    <div class="stat-item">
+                        <span class="stat-number">1000+</span>
+                        <span class="stat-label">Lines of C Code</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">40+</span>
+                        <span class="stat-label">Hours of Development</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">100+</span>
+                        <span class="stat-label">Bugs Squashed</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">∞</span>
+                        <span class="stat-label">Knowledge Gained</span>
+                    </div>
+                </div>
+
+                <p><strong>Low-Level Network Programming:</strong> Understanding TCP/IP at the socket level, handling endianness, managing connection states, and debugging network issues with tools like Wireshark and tcpdump.</p>
+
+                <p><strong>Cryptography in Practice:</strong> Learning the difference between symmetric and asymmetric encryption, understanding cipher suites, implementing secure key exchange, and seeing why certain algorithms are chosen over others.</p>
+
+                <p><strong>Memory Management:</strong> Manual memory allocation and deallocation, preventing memory leaks, understanding buffer overflows, and using tools like Valgrind for debugging.</p>
+
+                <p><strong>HTTP Protocol Internals:</strong> Parsing headers, handling different content types, understanding status codes, implementing proper error responses, and dealing with edge cases.</p>
+
+                <p><strong>OpenSSL API:</strong> Working with a complex C library, understanding contexts vs. connections, managing certificate chains, debugging cryptographic errors, and handling edge cases in TLS.</p>
+
+                <p><strong>Debugging Complex Systems:</strong> Tracing through multi-layered problems (application → TLS → TCP → IP), reading RFC specifications, interpreting error codes, and building mental models of complex systems.</p>
+            </div>
+
+            <!-- Challenges -->
+            <div class="section">
+                <h2>🎯 Challenges Overcome</h2>
+                
+                <div class="highlight-box">
+                    <h3>Certificate Path Nightmares</h3>
+                    <p>Spent hours debugging why certificates couldn't be found, only to discover the issue was relative paths vs. working directories. Lesson learned: always verify your working directory and use debug logging!</p>
+                </div>
+
+                <div class="highlight-box">
+                    <h3>The "No Shared Cipher" Mystery</h3>
+                    <p>SSL_accept() kept failing with cryptic errors about cipher suites. Solution required understanding how TLS cipher negotiation works and properly configuring OpenSSL's cipher list for both TLS 1.2 and 1.3.</p>
+                </div>
+
+                <div class="highlight-box">
+                    <h3>Memory Leaks Everywhere</h3>
+                    <p>Every SSL connection leaked memory because I forgot to call SSL_free(). Valgrind became my best friend for finding and fixing all memory leaks. Clean shutdown is harder than it looks!</p>
+                </div>
+
+                <div class="highlight-box">
+                    <h3>HTTP Parsing Edge Cases</h3>
+                    <p>Handling malformed requests, missing headers, partial reads, and buffer boundaries required careful string manipulation and bounds checking. One wrong pointer arithmetic and boom—segmentation fault!</p>
+                </div>
+            </div>
+
+            <!-- Future Plans -->
+            <div class="section">
+                <h2>🚀 What's Next</h2>
+                <p>This project is just the beginning. Here's what I'm planning to add:</p>
+
+                <div class="tech-stack">
+                    <div class="tech-card">
+                        <div class="icon">🔍</div>
+                        <h3>Security Scanner</h3>
+                        <p>Build tools to test cipher strength, scan for vulnerabilities, and verify TLS configuration against best practices.</p>
+                    </div>
+                    <div class="tech-card">
+                        <div class="icon">⚡</div>
+                        <h3>HTTP/2 Support</h3>
+                        <p>Implement binary framing, multiplexing, and server push for modern HTTP/2 protocol support.</p>
+                    </div>
+                    <div class="tech-card">
+                        <div class="icon">🧵</div>
+                        <h3>Multi-threading</h3>
+                        <p>Handle multiple concurrent connections efficiently using thread pools or async I/O.</p>
+                    </div>
+                    <div class="tech-card">
+                        <div class="icon">📊</div>
+                        <h3>Performance Monitoring</h3>
+                        <p>Add metrics, logging, and performance profiling to understand bottlenecks and optimize throughput.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Call to Action -->
+            <div class="cta-box">
+                <h2>Explore the Implementation</h2>
+                <p style="color: #2d3748; margin-bottom: 20px;">Dive deeper into the code, test the server, or contribute to the project!</p>
+                <div class="btn-group">
+                    <a href="/" class="btn btn-primary">Back to Home</a>
+                    <a href="/submit" class="btn btn-secondary">Try the Form</a>
+                    <a href="https://github.com/yourusername/http-server" class="btn btn-secondary">View on GitHub</a>
+                </div>
+            </div>
+
+            <!-- Author -->
+            <div class="author">
+                <div class="author-avatar">👨‍💻</div>
+                <div class="author-info">
+                    <h3>Built by Ethan Martin</h3>
+                    <p>Passionate about security, systems programming, and understanding how things work at a fundamental level. Always learning, always building.</p>
+                    <div class="social-links">
+                        <a href="https://github.com/EthanMartin123" class="social-link">GitHub</a>
+                        <a href="https://www.linkedin.com/in/ethan-m-825069167/" class="social-link">LinkedIn</a>
+                        <a href="mailto:mrethanmartin@gmail.com" class="social-link">Email</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
