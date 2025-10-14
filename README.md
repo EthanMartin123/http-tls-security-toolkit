@@ -57,16 +57,41 @@ https://localhost:8080/
 ```
 
 ## 📁 Project Structure
-
 ```
-http-tls-security-toolkit/
-├── src/              # Server source code
-│   └── server.c      # Main HTTP server implementation
-├── www/              # Static web files
-│   ├── index.html
-│   ├── success.html
-│   └── submit.html
-└── README.md
+http-server/
+├── src/                        # Server source code
+│   └── server.c                # Main HTTPS server implementation with TLS 1.3
+│
+├── certs/                      # SSL/TLS certificates
+│   ├── generate_certs.sh       # Certificate generation script
+│   ├── cert.pem                # Self-signed SSL certificate (auto-generated)
+│   └── key.pem                 # Private RSA key (auto-generated)
+│
+├── www/                        # Static web content
+│   ├── index.html              # Landing page
+│   ├── submit.html             # Secure form submission
+│   └── success.html            # Success confirmation
+│
+├── Makefile                    # Build automation (make, make run, make certs)
+├── .gitignore                  # Git ignore rules
+└── README.md                   # Project documentation
+```
+
+### Key Files
+
+| File | Description | Lines |
+|------|-------------|-------|
+| `src/server.c` | Core HTTPS server with TLS implementation | 1,200+ |
+| `certs/generate_certs.sh` | Automated SSL certificate generation | 20 |
+| `www/*.html` | Modern, responsive web interface | 300+ |
+| `Makefile` | Build system with multiple targets | 60 |
+
+### Generated Files (gitignored)
+
+- `server` - Compiled binary executable
+- `certs/cert.pem` - SSL certificate (4096-bit RSA)
+- `certs/key.pem` - Private key
+- `output.txt` - Form submission data
 ```
 
 ## 🛠️ Technologies
