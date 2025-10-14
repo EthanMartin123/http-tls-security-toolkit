@@ -23,9 +23,9 @@ This project demonstrates:
 - ✅ POST request handling with form data
 - ✅ Multiple route support
 - ✅ Proper HTTP status codes (200, 404, 400, 405, 500)
+- ✅ TLS 1.2/1.3 encryption
 
 ### Coming Soon
-- 🚧 TLS 1.2/1.3 encryption
 - 🚧 Security testing tools (scanner, fuzzer, analyzer)
 - 🚧 Vulnerability documentation
 - 🚧 Comprehensive security analysis
@@ -34,31 +34,26 @@ This project demonstrates:
 
 ### Prerequisites
 - GCC compiler
-- Make (optional but recommended)
+- Make (recommended)
 
 ### Build and Run
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/http-tls-security-toolkit.git
+git clone https://github.com/EthanMartin123/http-tls-security-toolkit.git
 cd http-tls-security-toolkit
 
-# Compile
-gcc -o server src/server.c -Wall -Wextra
+# Create Certificates & Compile
+make setup 
+
+# Run this if you need help!
+make help
 
 # Run server
 ./server
 
-# Test in another terminal
-curl http://localhost:8080/
-```
-
-### Test POST Requests
-
-```bash
-curl -X POST http://localhost:8080/submit \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "name=Test&email=test@example.com"
+# Test in your browser!
+https://localhost:8080/
 ```
 
 ## 📁 Project Structure
@@ -69,7 +64,7 @@ http-tls-security-toolkit/
 │   └── server.c      # Main HTTP server implementation
 ├── www/              # Static web files
 │   ├── index.html
-│   ├── about.html
+│   ├── success.html
 │   └── submit.html
 └── README.md
 ```
@@ -78,7 +73,8 @@ http-tls-security-toolkit/
 
 - **Language:** C
 - **Network:** POSIX sockets
-- **Upcoming:** OpenSSL for TLS, Python for security tools
+- **Encryption:** OpenSSL for TLS 
+- **Upcoming:** Python for security tools
 
 ## 📚 Learning Journey
 
