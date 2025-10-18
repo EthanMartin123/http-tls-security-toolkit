@@ -37,7 +37,7 @@ SSL_CTX *setup_tls() {
     exit(EXIT_FAILURE);
   }
 
-  if (SSL_CTX_set_cipher_list(ctx, "DEFAULT:!aNULL:!eNULL") == -1) {
+  if (SSL_CTX_set_cipher_list(ctx, "TLS_AES_256_GCM_SHA384:TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256:AES128-SHA") == -1) {
     fprintf(stderr, "failed to set cipher list\n");
     ERR_print_errors_fp(stderr);
     exit(EXIT_FAILURE);
