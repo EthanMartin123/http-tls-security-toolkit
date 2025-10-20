@@ -4,6 +4,10 @@ import sys
 import argparse
 from colorama import Fore, Style, init
 import warnings
+import datetime 
+from cryptography import x509
+from cryptography.hazmat.backends import default_backend
+import time
 
 init(autoreset=True)
 
@@ -24,6 +28,7 @@ weak_ciphers = ["DES-CBC3-SHA", "ECDHE-RSA-DES-CBC3-SHA", "AES128-SHA", "AES256-
 
 vulnerabilities = []
 
+
 def check_ciphers(host, port):
     print(Fore.CYAN + Style.BRIGHT + "\nScanning for Weak Ciphers... \n")
     for cipher in weak_ciphers:
@@ -37,7 +42,7 @@ def check_ciphers(host, port):
             context.verify_mode = ssl.CERT_NONE
             context.set_ciphers(cipher)
 
-            with socket.create_connection((host, port)) as sock:
+            with socket.create_connection((host, port), timeout=10) as sock:
                 with context.wrap_socket(sock, server_hostname=host) as ssock:
                     negotiated = ssock.cipher()
                     protocol = ssock.version()
@@ -50,6 +55,7 @@ def check_ciphers(host, port):
             print(Fore.GREEN + Style.BRIGHT + f" ✅ REJECTED: {cipher} ")
         except Exception as e:
             print(f" ❌ ERROR: {cipher} ({e}) ")
+        time.sleep(0.1)
 
 def test_protocol_versions(host, port):
     print(Fore.CYAN + Style.BRIGHT + "\nTesting Protocol Version... \n")
@@ -72,7 +78,7 @@ def test_protocol_versions(host, port):
             context.check_hostname = False
             context.verify_mode = ssl.CERT_NONE
 
-            with socket.create_connection((host, port)) as sock:
+            with socket.create_connection((host, port), timeout=10) as sock:
                 with context.wrap_socket(sock, server_hostname=host) as ssock:
                     if version < ssl.TLSVersion.TLSv1_2:
                         print(Fore.RED + Style.BRIGHT + f" ⚠️ DEPRECATED: {name}")
@@ -83,7 +89,49 @@ def test_protocol_versions(host, port):
                         print(Fore.GREEN + Style.BRIGHT + f" ✅ SUPPORTED: {name}")
         except:
             print(Fore.YELLOW + f" ❌ NOT SUPPORTED: {name}")
+        time.sleep(0.1)
     return supported, deprecated
+
+def check_certificate(host, port):
+    print(Fore. CYAN + Style.BRIGHT + "\nChecking Certificate... \n")
+
+    try:
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        context.check_hostname = False 
+        context.verify_mode = ssl.CERT_NONE 
+
+        with socket.create_connection((host, port), timeout=10) as sock:
+            with context.wrap_socket(sock, server_hostname=host) as ssock:
+                cert_bin = ssock.getpeercert(binary_form=True)
+                cert = x509.load_der_x509_certificate(cert_bin, default_backend())
+
+                #check expiration 
+                if cert.not_valid_after < datetime.datetime.now():
+                    print(Fore.RED + Style.BRIGHT + f" ⚠️ Certificate: EXPIRED")
+                else:
+                    days_left = (cert.not_valid_after - datetime.datetime.now()).days
+                    print(Fore.GREEN + Style.BRIGHT + f" ✅ Certificate: VALID ({days_left} days remaining)")
+
+                time.sleep(1)
+                #check signature algorithm 
+                sig_alg = cert.signature_algorithm_oid._name
+                if 'sha1' in sig_alg.lower() or 'md5' in sig_alg.lower():
+                    print(Fore.RED + Syle.BRIGHT + f" ⚠️ Signature: {sig_alg} (WEAK)")
+                else:
+                    print(Fore.GREEN + Style.BRIGHT + f" ✅ Signature: {sig_alg}")
+                time.sleep(1)
+
+                #check key size 
+                key_size = cert.public_key().key_size 
+                if key_size < 2048:
+                    print(Fore.RED + Style.BRIGHT + f" ⚠️ Key Size: {key_size} bits (TOO SMALL)")
+                else:
+                    print(Fore.GREEN + Style.BRIGHT + f" ✅ Key Size: {key_size} bits\n")
+                time.sleep(1)
+    except Exception as e:
+        print(Fore.RED + f" ❌ Error checking certificate: {e}\n")
+
+
 
 
 def print_summary(vulnerabilities, deprecated, supported):
@@ -110,6 +158,10 @@ def print_summary(vulnerabilities, deprecated, supported):
 
 
 if __name__ == "__main__":
-    check_ciphers(HOST,PORT)
     supported, deprecated = test_protocol_versions(HOST, PORT)
+    time.sleep(5)
+    check_ciphers(HOST,PORT)
+    time.sleep(5)
+    check_certificate(HOST, PORT)
     print_summary(vulnerabilities, deprecated, supported)
+
