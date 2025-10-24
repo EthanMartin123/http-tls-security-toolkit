@@ -24,9 +24,10 @@ This project demonstrates:
 - ✅ Multiple route support
 - ✅ Proper HTTP status codes (200, 404, 400, 405, 500)
 - ✅ TLS 1.2/1.3 encryption
+- ✅ TLS Scanner (cipher suites, certificate, version)
 
 ### Coming Soon
-- 🚧 Security testing tools (scanner, fuzzer, analyzer)
+- 🚧 More security testing tools (scanner, fuzzer, analyzer)
 - 🚧 Vulnerability documentation
 - 🚧 Comprehensive security analysis
 
@@ -34,6 +35,7 @@ This project demonstrates:
 
 ### Prerequisites
 - GCC compiler
+- Python3
 - Make (recommended)
 
 ### Build and Run
@@ -58,23 +60,28 @@ https://localhost:8080/
 
 ## 📁 Project Structure
 ```
-http-server/
-├── src/                        # Server source code
-│   └── server.c                # Main HTTPS server implementation with TLS 1.3
-│
-├── certs/                      # SSL/TLS certificates
-│   ├── generate_certs.sh       # Certificate generation script
-│   ├── cert.pem                # Self-signed SSL certificate (auto-generated)
-│   └── key.pem                 # Private RSA key (auto-generated)
-│
-├── www/                        # Static web content
-│   ├── index.html              # Landing page
-│   ├── submit.html             # Secure form submission
-│   └── success.html            # Success confirmation
-│
-├── Makefile                    # Build automation (make, make run, make certs)
-├── .gitignore                  # Git ignore rules
-└── README.md                   # Project documentation
+```
+  http-server/                                                                             
+  ├── src/                        # Server source code                                     
+  │   └── server.c                # Main HTTPS server implementation with TLS 1.3          
+  │                                                                                        
+  ├── certs/                      # SSL/TLS certificates                                   
+  │   ├── generate_certs.sh       # Certificate generation script                          
+  │   ├── cert.pem                # Self-signed SSL certificate (auto-generated)           
+  │   └── key.pem                 # Private RSA key (auto-generated)                       
+  │                                                                                        
+  ├── www/                        # Static web content                                     
+  │   ├── index.html              # Landing page                                           
+  │   ├── submit.html             # Secure form submission                                 
+  │   └── success.html            # Success confirmation                                   
+  │                                                                                        
+  ├── tools/                      # Security testing utilities                             
+  │   └── tls-scanner.py          # TLS vulnerability scanner (certificate, cipher, protocol checks)
+  │                                                                                        
+  ├── Makefile                    # Build automation (make, make run, make certs)          
+  ├── .gitignore                  # Git ignore rules                                       
+  └── README.md                   # Project documentation
+```
 ```
 
 ### Key Files
@@ -97,10 +104,9 @@ http-server/
 ```
 ## 🛠️ Technologies
 
-- **Language:** C
+- **Language:** C, Python
 - **Network:** POSIX sockets
 - **Encryption:** OpenSSL for TLS 
-- **Upcoming:** Python for security tools
 
 ## 📚 Learning Journey
 
