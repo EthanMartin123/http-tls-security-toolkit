@@ -16,13 +16,14 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <netdb.h>
+#include <sys/wait.h>
 
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/crypto.h>
 
 #define PORT "8080"
-#define BACKLOG 1
+#define BACKLOG 10
 #define BUFFER_SIZE 8192
 
 SSL_CTX *setup_tls() {
@@ -223,6 +224,11 @@ void post_parse_data(char* full_body) {
     fclose(file);
 }
 
+void sigchld_handler(int sig) {
+  (void)sig;
+  while (waitpid(-1, NULL, WNOHANG) > 0);
+}
+
 int main() {
 
   int sockfd, new_fd;
@@ -294,6 +300,17 @@ int main() {
     exit(EXIT_FAILURE);
   }
 
+  struct sigaction sa;
+  sa.sa_handler = sigchld_handler;
+  sigemptyset(&sa.sa_mask);
+  sa.sa_flags = SA_RESTART;
+  if (sigaction(SIGCHLD, &sa, NULL) == -1) {
+    perror("sigaction");
+    exit(EXIT_FAILURE);
+  }
+
+
+
   printf("HTTPS Listening on %s\n", PORT);
 
   while(1) {
@@ -306,124 +323,146 @@ int main() {
       continue;
     }
 
-    // TLS handshake per connection
-    SSL *ssl = SSL_new(ssl_ctx);
-    if (!ssl) {
-      perror("TLS handshake failed");
-      continue;
-    }
+    pid_t pid = fork();
 
-    if (SSL_set_fd(ssl, new_fd) == -1) {
-      perror("Failed to set fd with SSL");
-      continue;
-    }
-    
-    printf("Performing TLS handshake...\n");
-
-    if (SSL_accept(ssl) == -1) {
-      fprintf(stderr, "SSL_accept failed\n");
-      ERR_print_errors_fp(stderr);
-      SSL_free(ssl);
+    if (pid < 0) {
+      perror("fork");
       close(new_fd);
       continue;
     }
+    else if (pid == 0) {
+      close(sockfd);
+
+      // TLS handshake per connection
+      SSL *ssl = SSL_new(ssl_ctx);
+      if (!ssl) {
+        perror("TLS handshake failed");
+        continue;
+      }
+
+      if (SSL_set_fd(ssl, new_fd) == -1) {
+        perror("Failed to set fd with SSL");
+        continue;
+      }
+      
+      printf("Performing TLS handshake...\n");
+
+      if (SSL_accept(ssl) == -1) {
+        fprintf(stderr, "SSL_accept failed\n");
+        ERR_print_errors_fp(stderr);
+        SSL_free(ssl);
+        close(new_fd);
+        exit(EXIT_FAILURE);
+      }
 
 
-    bytes_received = SSL_read(ssl, buffer, sizeof(buffer) - 1); // receive bytes
+      bytes_received = SSL_read(ssl, buffer, sizeof(buffer) - 1); // receive bytes
 
-    if (bytes_received > 0) {
-      buffer[bytes_received] = '\0'; // adds a null terminator to the end of message
-      printf("Received HTTPS Request: \n%s\n", buffer);
+      if (bytes_received > 0) {
+        buffer[bytes_received] = '\0'; // adds a null terminator to the end of message
+        printf("Received HTTPS Request: \n%s\n", buffer);
 
-      if (sscanf(buffer, "%s %s %s", method, path, version) == 3){
+        if (sscanf(buffer, "%s %s %s", method, path, version) == 3){
 
-        // HANDLE REQUESTS 
-        if (strcmp(method, "GET") == 0) {
-          char filepath[512];
+          // HANDLE REQUESTS 
+          if (strcmp(method, "GET") == 0) {
+            char filepath[512];
 
-          if (strcmp(path, "/") == 0) {
-            strcpy(filepath, "www/index.html");
-          }
-          else if (strcmp(path, "/success") == 0) {
-            strcpy(filepath, "www/success.html");
-          }
-          else if (strcmp(path, "/submit") == 0) {
-            strcpy(filepath, "www/submit.html");
-          }
-          else {
-            snprintf(filepath, sizeof(filepath), "%s", path + 1);    
-          }
-
-          send_file_response(ssl, filepath);
-
-        } else if (strcmp(method, "POST") == 0)
-        {
-          if (strcmp(path, "/submit") == 0) {
-
-            int content_length = extract_content_length(ssl, buffer);
-            printf("DEBUG: content_length = %d\n", content_length);
-            if (content_length == -1) {
-              close(new_fd);
-              continue;
+            if (strcmp(path, "/") == 0) {
+              strcpy(filepath, "www/index.html");
+            }
+            else if (strcmp(path, "/success") == 0) {
+              strcpy(filepath, "www/success.html");
+            }
+            else if (strcmp(path, "/submit") == 0) {
+              strcpy(filepath, "www/submit.html");
+            }
+            else {
+              snprintf(filepath, sizeof(filepath), "%s", path + 1);    
             }
 
-            char *body_start = strstr(buffer, "\r\n\r\n");
-            if (body_start == NULL) {
-              const char* response_400_malformed = 
-                "HTTP/1.1 400 Bad Request\r\n"
+            send_file_response(ssl, filepath);
+
+          } else if (strcmp(method, "POST") == 0)
+          {
+            if (strcmp(path, "/submit") == 0) {
+
+              int content_length = extract_content_length(ssl, buffer);
+              printf("DEBUG: content_length = %d\n", content_length);
+              if (content_length == -1) {
+                close(new_fd);
+                continue;
+              }
+
+              char *body_start = strstr(buffer, "\r\n\r\n");
+              if (body_start == NULL) {
+                const char* response_400_malformed = 
+                  "HTTP/1.1 400 Bad Request\r\n"
+                  "Content-Type: text/html\r\n"
+                  "\r\n"
+                  "<html><body><h1>400 Bad Request</h1>"
+                  "<p>Malformed HTTP Request</p></body></html>";
+                
+
+                SSL_write(ssl, response_400_malformed, strlen(response_400_malformed));
+                printf("400 Bad Request: Malformed HTTP Request\n");
+                return -1;
+              }
+
+              // point to after \r\n\r\n
+              body_start += 4;
+
+              int body_bytes_received = bytes_received - (body_start - buffer);
+              printf("DEBUG: body_bytes_received = %d\n", body_bytes_received);
+
+              char *full_body = malloc(content_length + 1);
+
+              memcpy(full_body, body_start, body_bytes_received);
+
+              while(body_bytes_received < content_length) {
+                ssize_t new_bytes = recv(new_fd, full_body + body_bytes_received, content_length - body_bytes_received, 0);
+                if (new_bytes > 0) {
+                  body_bytes_received += new_bytes;
+                }
+              }
+
+              full_body[content_length] = '\0';
+
+              printf("DEBUG: full_body content: [%s]\n", full_body);
+              printf("DEBUG: full_body length: %ld\n", strlen(full_body));
+
+              post_parse_data(full_body);
+
+              const char *response_200 = 
+                "HTTP/1.1 200 OK\r\n"
                 "Content-Type: text/html\r\n"
                 "\r\n"
-                "<html><body><h1>400 Bad Request</h1>"
-                "<p>Malformed HTTP Request</p></body></html>";
+                "<html><body><h1>Success!</h1><p>Form Submitted successfully</p><a href='/'>Home</a></body></html>";
+              
+              
+              char filepath[512];
+              strcpy(filepath, "www/success.html");
+              send_file_response(ssl, filepath);
+              printf("200 OK - POST processed\n");
+
+              free(full_body);
+
+            }
+            else {
+              
+              const char *response_405 = 
+                "HTTP/1.1 405 Method Not Allowed"
+                "Content-Type: text/html\r\n"
+                "\r\n"
+                "<html><body><h1>405 Method Not Allowed</h1></body></html>";
               
 
-              SSL_write(ssl, response_400_malformed, strlen(response_400_malformed));
-              printf("400 Bad Request: Malformed HTTP Request\n");
-              return -1;
+              SSL_write(ssl, response_405, sizeof(response_405));
+              printf("405 - Method Not Allowed: %s\n", method);
             }
-
-            // point to after \r\n\r\n
-            body_start += 4;
-
-            int body_bytes_received = bytes_received - (body_start - buffer);
-            printf("DEBUG: body_bytes_received = %d\n", body_bytes_received);
-
-            char *full_body = malloc(content_length + 1);
-
-            memcpy(full_body, body_start, body_bytes_received);
-
-            while(body_bytes_received < content_length) {
-              ssize_t new_bytes = recv(new_fd, full_body + body_bytes_received, content_length - body_bytes_received, 0);
-              if (new_bytes > 0) {
-                body_bytes_received += new_bytes;
-              }
-            }
-
-            full_body[content_length] = '\0';
-
-            printf("DEBUG: full_body content: [%s]\n", full_body);
-            printf("DEBUG: full_body length: %ld\n", strlen(full_body));
-
-            post_parse_data(full_body);
-
-            const char *response_200 = 
-              "HTTP/1.1 200 OK\r\n"
-              "Content-Type: text/html\r\n"
-              "\r\n"
-              "<html><body><h1>Success!</h1><p>Form Submitted successfully</p><a href='/'>Home</a></body></html>";
-            
-            
-            char filepath[512];
-            //SSL_write(ssl, response_200, strlen(response_200));
-            strcpy(filepath, "www/success.html");
-            send_file_response(ssl, filepath);
-            printf("200 OK - POST processed\n");
-
-            free(full_body);
-
           }
-          else {
-            
+          else 
+          {
             const char *response_405 = 
               "HTTP/1.1 405 Method Not Allowed"
               "Content-Type: text/html\r\n"
@@ -435,29 +474,16 @@ int main() {
             printf("405 - Method Not Allowed: %s\n", method);
           }
         }
-        else 
-        {
-          const char *response_405 = 
-            "HTTP/1.1 405 Method Not Allowed"
-            "Content-Type: text/html\r\n"
-            "\r\n"
-            "<html><body><h1>405 Method Not Allowed</h1></body></html>";
-          
 
-          SSL_write(ssl, response_405, sizeof(response_405));
-          printf("405 - Method Not Allowed: %s\n", method);
-        }
       }
-
+      SSL_shutdown(ssl);
+      SSL_free(ssl);
+      close(new_fd);
+      exit(EXIT_SUCCESS);
     }
-    SSL_shutdown(ssl);
-    SSL_free(ssl);
-    close(new_fd);
-
+    else {
+      close(new_fd);
+    }
   }
-
-  close(sockfd);
-
   return 0;
-
 }
